@@ -8,5 +8,5 @@ import 'package:cinemapedia/infrastructure/repositories/movie_repository_impl.da
    * Repositorio inmutable.  
 */
 final movieRepositoryProvider = Provider((ref) {
-    return MovieReposioryImpl( MovieDbDatasource() );
+    return MovieRepositoryImpl( MovieDbDatasource() );
 });
