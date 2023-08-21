@@ -47,7 +47,7 @@ class Cast {
         required this.name,
         required this.originalName,
         required this.popularity,
-        required this.profilePath,
+        this.profilePath,
         this.castId,
         this.character,
         required this.creditId,
@@ -69,7 +69,7 @@ class Cast {
         character: json["character"],
         creditId: json["credit_id"],
         order: json["order"],
-        department: json["department"]!,
+        department: json["department"],
         job: json["job"],
     );
 
