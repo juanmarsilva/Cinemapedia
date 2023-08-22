@@ -5,8 +5,6 @@ import 'package:cinemapedia/domain/entities/movie.dart';
 import 'package:cinemapedia/infrastructure/mappers/movie_mapper.dart';
 import 'package:cinemapedia/infrastructure/models/moviedb/moviedb_response.dart';
 
-
-
 class MovieDbDatasource extends MoviesDatasource {
 
     final dio = Dio(BaseOptions(
@@ -17,12 +15,21 @@ class MovieDbDatasource extends MoviesDatasource {
         }
     ));
 
-    @override
-    Future<List<Movie>> getNowPlaying({int page = 1}) async {
+    /*
+      * custom get para invocar por url.
+    */
+    Future<Response<dynamic>> customGet(String url, int page) async {
+        return await dio.get(url, queryParameters: {
+            'page': page
+        });
+    }
 
-        final response = await dio.get('/movie/now_playing');
+    /*
+      * Convierte la respuesta JSON del servicio get en un listado de peliculas a devolver.
+    */
+    List<Movie> _jsonToMovies( Map<String, dynamic> json ) {
 
-        final movieDbResponse = MovieDbResponse.fromJson(response.data);
+        final movieDbResponse = MovieDbResponse.fromJson( json );
 
         /*
           * De esta manera evitamos renderizar o tener en el listado peliculas cuyo poster no exista. Es como filtrarlas. Para evitar que la aplicacion rompa en otro punto.
@@ -37,7 +44,33 @@ class MovieDbDatasource extends MoviesDatasource {
         return movies;
     }
 
+    @override
+    Future<List<Movie>> getNowPlaying({ int page = 1 }) async {
+        final response = await customGet('/movie/now_playing', page);
 
+        return _jsonToMovies( response.data );
+    }
+    
+    @override
+    Future<List<Movie>> getPopular({ int page = 1 }) async {
+        final response = await customGet('/movie/popular', page);
 
+        return _jsonToMovies( response.data );
+       
+    }
+    
+    @override
+    Future<List<Movie>> getTopRated({int page = 1}) async {
+        final response = await customGet('/movie/top_rated', page);
+
+        return _jsonToMovies( response.data );
+    }
+    
+    @override
+    Future<List<Movie>> getUpcoming({int page = 1}) async {
+        final response = await customGet('/movie/upcoming', page);
+
+        return _jsonToMovies( response.data );
+    }
 
 }
