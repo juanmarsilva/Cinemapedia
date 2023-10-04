@@ -1,0 +1,1 @@
+export 'package:cinemapedia/infrastructure/models/moviedb/moviedb.dart';
