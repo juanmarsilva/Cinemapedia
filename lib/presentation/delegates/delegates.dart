@@ -1,0 +1,1 @@
+export 'package:cinemapedia/presentation/delegates/search_movies_delegate.dart';
