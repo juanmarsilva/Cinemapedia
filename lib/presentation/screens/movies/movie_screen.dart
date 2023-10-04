@@ -2,7 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cinemapedia/domain/entities/movie.dart';
+import 'package:cinemapedia/domain/domain.dart';
 import 'package:cinemapedia/presentation/providers/providers.dart';
 
 class MovieScreen extends ConsumerStatefulWidget {
@@ -196,7 +196,14 @@ class _ActorsByMovie extends ConsumerWidget {
   }
 }
 
-class _CustomSliverAppBar extends StatelessWidget {
+
+final isFavoriteProvider = FutureProvider.family.autoDispose((ref, int movieId) {
+    final localStorageRepository = ref.watch( localStorageRepositoryProvider );
+
+    return localStorageRepository.isMovieInFavorites(movieId);
+});
+
+class _CustomSliverAppBar extends ConsumerWidget {
 
     final Movie movie;
     
@@ -205,7 +212,9 @@ class _CustomSliverAppBar extends StatelessWidget {
     });
 
     @override
-    Widget build(BuildContext context) {
+    Widget build(BuildContext context, WidgetRef ref) {
+
+        final AsyncValue<bool> isMovieInFavorites = ref.watch( isFavoriteProvider(movie.id) );
 
         final size = MediaQuery.of(context).size;
 
@@ -215,10 +224,21 @@ class _CustomSliverAppBar extends StatelessWidget {
             foregroundColor: Colors.white,
             actions: [
                 IconButton(
-                    onPressed: () {}, 
+                    onPressed: () {
+                        ref
+                          .watch( localStorageRepositoryProvider )
+                          .toogleFavorite(movie);
+
+                        ref.invalidate( isFavoriteProvider(movie.id) );
+                    }, 
                     // icon: const Icon(Icons.favorite_border_rounded)
-                    icon: const Icon(Icons.favorite_rounded, color: Colors.red)
-                )
+                    icon: isMovieInFavorites.when(
+                            loading: () => const CircularProgressIndicator( strokeWidth: 2 ),
+                            data: (isInFavorites) => isInFavorites 
+                                ? const Icon( Icons.favorite_rounded, color: Colors.red )
+                                :  const Icon( Icons.favorite_border ),
+                            error: (_, __) => throw UnimplementedError(), 
+                        ))
             ],
             flexibleSpace: FlexibleSpaceBar(
                 background: Stack(
