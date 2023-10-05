@@ -224,10 +224,9 @@ class _CustomSliverAppBar extends ConsumerWidget {
             foregroundColor: Colors.white,
             actions: [
                 IconButton(
-                    onPressed: () {
-                        ref
-                          .watch( localStorageRepositoryProvider )
-                          .toogleFavorite(movie);
+                    onPressed: () async {
+
+                        await ref.read( favoritesMoviesProvider.notifier ).toogleFavorite(movie);
 
                         ref.invalidate( isFavoriteProvider(movie.id) );
                     }, 
